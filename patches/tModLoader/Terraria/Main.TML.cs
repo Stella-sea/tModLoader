@@ -476,8 +476,23 @@ public partial class Main
 			vanillaContentFolder = Path.Combine(Steam.GetSteamTerrariaInstallDir(), "Content");
 		}
 		else if (InstallVerifier.DistributionPlatform == DistributionPlatform.GoG) {
-			vanillaContentFolder = Path.Combine(Path.GetDirectoryName(InstallVerifier.vanillaExePath), "Content");
-			Logging.tML.Info("Content folder of Terraria GOG Install Location assumed to be: " + Path.GetFullPath(vanillaContentFolder));
+			// For non-Steam environments, try to find Content folder in common locations
+			if (!string.IsNullOrEmpty(InstallVerifier.vanillaExePath) && File.Exists(InstallVerifier.vanillaExePath)) {
+				vanillaContentFolder = Path.Combine(Path.GetDirectoryName(InstallVerifier.vanillaExePath), "Content");
+				Logging.tML.Info("Content folder of Terraria GOG Install Location assumed to be: " + Path.GetFullPath(vanillaContentFolder));
+			}
+			else {
+				// Fallback: try common locations for Content folder
+				vanillaContentFolder = Platform.IsOSX ? "../Terraria/Terraria.app/Contents/Resources/Content" : "../Terraria/Content";
+				if (!Directory.Exists(vanillaContentFolder)) {
+					vanillaContentFolder = Platform.IsOSX ? "../Terraria.app/Contents/Resources/Content" : "../Content";
+				}
+				if (!Directory.Exists(vanillaContentFolder)) {
+					// Try current directory
+					vanillaContentFolder = "Content";
+				}
+				Logging.tML.Info("Content folder fallback location: " + Path.GetFullPath(vanillaContentFolder));
+			}
 		}
 		// Explicitly path if we are family shared using the old logic from prior to #4018; Temporary Hotfix - Solxan
 		// Maybe replace with a call to get InstallDir from TerrariaSteamClient? Or change Steam.GetInstallDir to be 'FamilyShare' safe?

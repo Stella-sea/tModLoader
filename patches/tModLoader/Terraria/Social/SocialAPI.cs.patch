@@ -27,7 +27,8 @@
 +			*/
 +
 +			// Added FamilyShared check as workaround for #881
-+			if (!Main.dedServ && !SteamedWraps.FamilyShared) {
++			// Also check for -nosteam parameter to force non-Steam mode
++			if (!Main.dedServ && !SteamedWraps.FamilyShared && !Program.LaunchParameters.ContainsKey("-nosteam")) {
 +#if DEBUG
 +				if (!Program.LaunchParameters.ContainsKey("-nosteam")) {
 +#endif

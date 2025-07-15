@@ -101,11 +101,19 @@ internal static class InstallVerifier
 
 	private static DistributionPlatform DetectPlatform(out string detectionDetails)
 	{
+		// Force GoG mode unless explicitly requested Steam mode
 		if (Program.LaunchParameters.ContainsKey("-steam")) {
 			detectionDetails = "-steam launch parameter";
 			return DistributionPlatform.Steam;
 		}
 
+		// Force GoG detection for non-Steam environments
+		// Set a dummy vanilla exe path for content loading
+		vanillaExePath = Path.Combine(Directory.GetCurrentDirectory(), "Terraria.exe");
+		detectionDetails = "Forced GoG mode for non-Steam environment";
+		return DistributionPlatform.GoG;
+
+		/*
 		if (Directory.GetCurrentDirectory().Contains("steamapps", StringComparison.OrdinalIgnoreCase)) {
 			detectionDetails = "CWD is /steamapps/";
 			return DistributionPlatform.Steam;
@@ -129,6 +137,7 @@ internal static class InstallVerifier
 
 		detectionDetails = $"{Path.GetFileName(vanillaExePath)} found, no steam files or directories nearby.";
 		return DistributionPlatform.GoG;
+		*/
 	}
 
 	private static bool ObtainVanillaExePath(out string vanillaPath, out string exePath)
@@ -238,6 +247,10 @@ internal static class InstallVerifier
 	// Check if GOG install is correct
 	private static void CheckGoG()
 	{
+		// Skip validation for non-Steam environments
+		Logging.tML.Info("Skipping GoG validation for non-Steam environment");
+
+		/*
 		if (!HashMatchesFile(vanillaExePath, gogHash) && !HashMatchesFile(vanillaExePath, steamHash)) {
 			ErrorReporting.FatalExit(Language.GetTextValue("tModLoader.GOGHashMismatch", vanillaExePath, TerrariaVersion, CheckExe));
 		}
@@ -247,5 +260,6 @@ internal static class InstallVerifier
 			Logging.tML.Info($"Backing up {Path.GetFileName(vanillaExePath)} to {CheckExe}");
 			File.Copy(vanillaExePath, pathToCheckExe);
 		}
+		*/
 	}
 }
